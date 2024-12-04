@@ -1,0 +1,183 @@
+---
+title: 'SDK'
+description: 'The SDK is a comprehensive TypeScript SDK designed to facilitate interaction with the T3id decentralized identity system.'
+---
+
+## T3id TypeScript SDK
+
+The `@trident3/t3id` package is a comprehensive JavaScript SDK designed to facilitate interaction with the T3id decentralized identity system. This SDK provides developers with a robust set of tools to manage T3id NFTs, handle certificates, and perform identity verification operations seamlessly. It is built on top of the ethers.js library, ensuring compatibility with Ethereum and Ethereum-compatible blockchains.
+
+#### Installation
+
+To install the SDK, you can use npm:
+
+```
+npm add @trident3/t3id
+```
+
+The package mainly has `ethers` as a dependency, and so will work on both client and server applications.
+
+#### Overview
+
+The `T3id` class is the primary interface for interacting with the T3id system. It encapsulates all necessary functionalities, including minting T3ids, managing certificates, and verifying identities across chains. The SDK is designed to be flexible, allowing developers to use it with either a signer or a provider, depending on their needs.
+
+#### Initialization
+
+To start using the SDK, you need to initialize a `T3id` instance. This can be done by providing a signer or provider. If none is provided, the SDK will default to using a JSON-RPC provider with a specified RPC URL.
+
+```
+import { T3id } from '@trident3/t3id';
+import { ethers } from 'ethers';
+
+// Example with a signer
+const provider = new ethers.providers.JsonRpcProvider('https://polygon-rpc.com');
+const signer = provider.getSigner();
+const t3id = T3id.from(signer);
+
+// Example with a provider
+const t3idWithProvider = T3id.from(provider);
+```
+
+#### Core T3id Management
+
+**Minting a T3id**
+
+The `mint` function allows users to create a new T3id NFT with a unique @name. The @name must be between 1 and 32 characters long and consist of lowercase alphanumeric characters.
+
+```
+async function mintT3id(atname: string): Promise<number> {
+  try {
+    const tokenId = await t3id.mint(atname);
+    console.log(`Minted T3id with tokenId: ${tokenId}`);
+    return tokenId;
+  } catch (error) {
+    console.error('Error minting T3id:', error);
+  }
+}
+```
+
+**Checking @name Availability**
+
+Before minting, you can check if an @name is available using the `isAtNameAvailable` function.
+
+```
+async function checkAtNameAvailability(atname: string): Promise<boolean> {
+  const isAvailable = await t3id.isAtNameAvailable(atname);
+  console.log(`Is @name "${atname}" available?`, isAvailable);
+  return isAvailable;
+}
+```
+
+**Retrieving @name and Token ID**
+
+The SDK provides functions to retrieve the @name associated with a token ID and vice versa.
+
+```
+async function getAtName(tokenId: number): Promise<string> {
+  return await t3id.getAtName(tokenId);
+}
+
+async function getTokenId(atname: string): Promise<number> {
+  return await t3id.getTokenIdByAtName(atname);
+}
+```
+
+#### Certificate Management
+
+**Adding a Certificate**
+
+Certificates can be added to a T3id to enhance its functionality. The `addCertificate` function requires the token ID, public key, category, expiration date, and metadata URI.
+
+```
+async function addCertificateToT3id(
+  tokenId: number,
+  publicKey: string,
+  category: string,
+  expirationDate: Date | null,
+  metadataURI: string
+): Promise<void> {
+  try {
+    await t3id.addCertificate(tokenId, publicKey, category, expirationDate, metadataURI);
+    console.log('Certificate added successfully');
+  } catch (error) {
+    console.error('Error adding certificate:', error);
+  }
+}
+```
+
+**Retrieving Certificates**
+
+You can retrieve all certificates associated with a T3id using the `getCertificates` function.
+
+```
+async function getCertificatesForT3id(tokenId: number): Promise<Certificate[]> {
+  const certificates = await t3id.getCertificates(tokenId);
+  console.log('Certificates:', certificates);
+  return certificates;
+}
+```
+
+#### Scoring and Verification
+
+**Identity Scoring**
+
+The SDK provides functions to retrieve the overall identity score and category-specific scores for a T3id.
+
+```
+async function getIdScore(tokenId: number): Promise<number> {
+  return await t3id.getIdScore(tokenId);
+}
+
+async function getCategoryScore(tokenId: number, category: string): Promise<number> {
+  return await t3id.getCategoryScore(tokenId, category);
+}
+```
+
+**Requesting Verification**
+
+Cross-chain verification can be initiated using the `requestVerification` function, which requires the destination chain ID, token ID, and category.
+
+```
+async function requestCrossChainVerification(
+  dstChainId: number,
+  tokenId: number,
+  category: string
+): Promise<void> {
+  try {
+    await t3id.requestVerification(dstChainId, tokenId, category);
+    console.log('Verification request sent');
+  } catch (error) {
+    console.error('Error requesting verification:', error);
+  }
+}
+```
+
+#### Event Handling
+
+The SDK supports event handling for various T3id-related events, such as certificate addition, revocation, and score updates.
+
+```
+t3id.onCertificateAdded((tokenId, certId, issuer) => {
+  console.log(`Certificate added: Token ID ${tokenId}, Cert ID ${certId}, Issuer ${issuer}`);
+});
+
+t3id.onCertificateRevoked((tokenId, certId) => {
+  console.log(`Certificate revoked: Token ID ${tokenId}, Cert ID ${certId}`);
+});
+
+t3id.onScoreUpdated((tokenId, newScore) => {
+  console.log(`Score updated: Token ID ${tokenId}, New Score ${newScore}`);
+});
+
+t3id.onAtNameSet((tokenId, atname) => {
+  console.log(`@name set: Token ID ${tokenId}, @name ${atname}`);
+});
+```
+
+#### Advanced Usage
+
+The SDK is designed to be extensible and can be integrated into various applications, from decentralized applications (dApps) to enterprise solutions requiring robust identity management. Developers can leverage the SDK to build custom workflows, automate identity verification processes, and integrate T3id functionality into existing systems.
+
+For more detailed examples and advanced usage scenarios, refer to the SDK documentation and explore the source code available on the project's GitHub repository.
+
+

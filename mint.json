@@ -1,91 +1,61 @@
 {
   "$schema": "https://mintlify.com/schema.json",
-  "name": "Starter Kit",
+  "name": "Trident3",
   "logo": {
-    "dark": "/logo/dark.svg",
-    "light": "/logo/light.svg"
+    "dark": "/logo/dark.png",
+    "light": "/logo/light.png"
   },
   "favicon": "/favicon.svg",
   "colors": {
-    "primary": "#0D9373",
-    "light": "#07C983",
-    "dark": "#0D9373",
+    "primary": "#0bd2a8",
+    "light": "#0bd2a8",
+    "dark": "#0bd2a8",
     "anchors": {
-      "from": "#0D9373",
-      "to": "#07C983"
+      "from": "#0bd2a8",
+      "to": "#0bd2a8"
     }
   },
   "topbarLinks": [
     {
-      "name": "Support",
-      "url": "mailto:hi@mintlify.com"
+      "name": "Get in Touch",
+      "url": "mailto:steve@trident3.io"
     }
   ],
   "topbarCtaButton": {
-    "name": "Dashboard",
-    "url": "https://dashboard.mintlify.com"
+    "name": "Back to Trident3",
+    "url": "https://trident3.io"
   },
-  "tabs": [
-    {
-      "name": "API Reference",
-      "url": "api-reference"
-    }
-  ],
+  "tabs": [],
   "anchors": [
     {
       "name": "Documentation",
       "icon": "book-open-cover",
-      "url": "https://mintlify.com/docs"
+      "url": "https://docs.trident3.io"
     },
     {
       "name": "Community",
-      "icon": "slack",
-      "url": "https://mintlify.com/community"
+      "icon": "discord",
+      "url": "https://www.trident3.io/coming-soon"
     },
     {
-      "name": "Blog",
+      "name": "For Business",
       "icon": "newspaper",
-      "url": "https://mintlify.com/blog"
+      "url": "https://www.trident3.io/coming-soon"
     }
   ],
   "navigation": [
     {
-      "group": "Get Started",
+      "group": "T3id (Private Alpha)",
       "pages": [
         "introduction",
-        "quickstart",
-        "development"
-      ]
-    },
-    {
-      "group": "Essentials",
-      "pages": [
-        "essentials/markdown",
-        "essentials/code",
-        "essentials/images",
-        "essentials/settings",
-        "essentials/navigation",
-        "essentials/reusable-snippets"
-      ]
-    },
-    {
-      "group": "API Documentation",
-      "pages": [
-        "api-reference/introduction"
-      ]
-    },
-    {
-      "group": "Endpoint Examples",
-      "pages": [
-        "api-reference/endpoint/get",
-        "api-reference/endpoint/create",
-        "api-reference/endpoint/delete"
+        "smart-contract",
+        "typescript-sdk"
       ]
     }
   ],
   "footerSocials": {
-    "x": "https://x.com/mintlify",
-    "github": "https://github.com/mintlify",
-    "linkedin": "https://linkedin.com/company/mintlify"
+    "x": "https://x.com/Trident3Web3",
+    "github": "https://github.com/Trident3-Inc",
+    "linkedin": "https://www.linkedin.com/company/trident3"
   }
 }

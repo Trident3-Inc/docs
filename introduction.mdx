@@ -1,71 +1,75 @@
 ---
 title: Introduction
-description: 'Welcome to the home of your new documentation'
+description: 'This is to serve as an early documentation of T3id, how it works, and the SDK we provide.'
 ---
 
-<img
-  className="block dark:hidden"
-  src="/images/hero-light.svg"
-  alt="Hero Light"
-/>
-<img
-  className="hidden dark:block"
-  src="/images/hero-dark.svg"
-  alt="Hero Dark"
-/>
+# Welcome
 
-## Setting up
+This is to serve as an early documentation of T3id, how it works, and the SDK we provide.
 
-The first step to world-class documentation is setting up your editing environments.
+## How it Works
 
-<CardGroup cols={2}>
-  <Card
-    title="Edit Your Docs"
-    icon="pen-to-square"
-    href="https://mintlify.com/docs/quickstart"
-  >
-    Get your docs set up locally for easy development
-  </Card>
-  <Card
-    title="Preview Changes"
-    icon="image"
-    href="https://mintlify.com/docs/development"
-  >
-    Preview your changes before you push to make sure they're perfect
-  </Card>
-</CardGroup>
+T3id is a decentralized identity system that leverages NFTs to represent digital identities. Each T3id is a unique NFT associated with a human-readable @name, such as @alice, which serves as an identifier. This system is designed to provide a secure, verifiable, and flexible identity solution that can be used across various applications and platforms.
 
-## Make it yours
+### Core Components
 
-Update your docs to your brand and add valuable content for the best user conversion.
+**Identity (T3id NFT)**
+- Represents a digital identity as a unique NFT.
+- Associated with a human-readable @name (1-32 characters, alphanumeric).
+- Can hold multiple certificates, each representing a public key and associated metadata.
+- Maintains an identity score based on valid certificates, which can be used to assess the trustworthiness and completeness of the identity.
 
-<CardGroup cols={2}>
-  <Card
-    title="Customize Style"
-    icon="palette"
-    href="https://mintlify.com/docs/settings/global"
-  >
-    Customize your docs to your company's colors and brands
-  </Card>
-  <Card
-    title="Reference APIs"
-    icon="code"
-    href="https://mintlify.com/docs/api-playground/openapi"
-  >
-    Automatically generate endpoints from an OpenAPI spec
-  </Card>
-  <Card
-    title="Add Components"
-    icon="screwdriver-wrench"
-    href="https://mintlify.com/docs/components/accordion"
-  >
-    Build interactive features and designs to guide your users
-  </Card>
-  <Card
-    title="Get Inspiration"
-    icon="stars"
-    href="https://mintlify.com/customers"
-  >
-    Check out our showcase of our favorite documentation
-  </Card>
-</CardGroup>
+**Certificates**
+- Public keys stored on-chain with metadata, serving as verifiable credentials.
+- Used for signing, encryption, and verification, enabling secure interactions and transactions.
+- Includes:
+  - Public key: The cryptographic key used for verification.
+  - Category: Defines the type of certificate (e.g., 'SSO', 'KYC', 'FACE').
+  - Issuer address: The blockchain address of the entity that issued the certificate.
+  - Issuance and expiration dates: Define the validity period of the certificate.
+  - Additional metadata URI: Links to off-chain data for extended information.
+
+**Scoring System**
+- Each certificate category has base and minimum scores, reflecting its importance and trust level.
+- Scores decay linearly from issuance to expiration, ensuring that outdated certificates do not unduly influence the identity score.
+- Total identity score is derived from valid certificates, providing a quantitative measure of identity strength.
+- Categories include KYC (40/15), FACE (25/5), etc., each contributing differently to the overall score.
+
+### Key Operations
+
+**Minting a T3id**
+- Creates a new T3id NFT with a unique @name, which serves as a permanent identifier for the user. This process involves generating a new NFT and associating it with the chosen @name, ensuring that the name is unique and adheres to the format requirements.
+
+**Adding Certificates**
+- Adds a new certificate to a T3id from an approved issuer. This operation involves verifying the issuer's approval status, generating a unique certificate ID, and storing the certificate data on-chain. Certificates enhance the T3id's functionality by enabling cryptographic operations and contributing to the identity score.
+
+**Cross-chain Verification**
+- Verifies T3id certificates across chains via LayerZero, a protocol that facilitates cross-chain communication. This feature allows T3id to be used in multi-chain environments, expanding its applicability and ensuring that identity verification is consistent across different blockchain networks.
+
+### Architecture
+
+The system consists of four main contracts:
+- **T3idImplementation**: Handles core NFT and certificate logic, including minting, certificate management, and cross-chain verification.
+- **T3idProxy**: Implements the upgradeable proxy pattern, allowing for seamless contract upgrades without disrupting existing data and functionality.
+- **T3idRegistry**: Manages issuers and categories, ensuring that only approved entities can issue certificates and that categories are properly configured.
+- **T3idStorage**: Stores certificates and scoring data, providing efficient access and management of identity-related information.
+
+### Categories and Issuers
+
+T3id supports a tiered system of certificate categories and issuer approvals, ensuring that certificates are issued by trusted entities and that their impact on the identity score is appropriately weighted.
+
+**Primary**
+- Includes high-trust categories such as government-issued IDs and KYC.
+- Issuers must be approved by T3id administrators, ensuring a high level of trust and security.
+- Certificates in this category contribute significantly to the identity score, reflecting their importance in verifying identity.
+
+**Verified**
+- Consists of trusted partners of Trident3, who have been vetted and approved to issue certificates.
+- Requires issuer approval but is less stringent than Primary, allowing for a broader range of trusted entities.
+- Used for partner-specific verifications and services, enhancing the flexibility and applicability of T3id.
+
+**Other**
+- Open to all issuers without the need for prior approval, enabling a wide range of use cases and applications.
+- Includes general-purpose certificates with minimal impact on the identity score, suitable for less critical verifications.
+
+For detailed contract interactions, refer to the individual contract documentation.

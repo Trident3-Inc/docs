@@ -1,0 +1,134 @@
+---
+title: 'Smart Contract'
+description: 'Exploration of the smart contracts that make up the T3id system.'
+---
+
+## Smart Contract
+
+### T3idImplementation.sol
+
+Core NFT and certificate management contract that implements the T3id functionality. This contract serves as the main entry point for interacting with T3ids, handling everything from minting to certificate management to cross-chain verification.
+
+**Key Functions:**
+
+**Identity Management**
+- `mint(string atName)`: Creates a new T3id NFT with a unique @name. The @name must be 1-32 characters long and contain only lowercase alphanumeric characters. This @name becomes permanently associated with the T3id and can be used as a human-readable identifier.
+- `burnT3id(uint256 tokenId)`: Burns a T3id NFT, clearing all associated data including certificates and @name mappings. This operation is irreversible and should be used with caution.
+
+**Certificate Operations**
+- `addCertificate(uint256 tokenId, bytes32 publicKey, string category, uint256 expirationDate, string metadataURI)`: Adds a new certificate to a T3id. Only approved issuers can add certificates for specific categories. The certificate stores a public key that can be used for various cryptographic operations, along with metadata and expiration information.
+- `burnCertificate(uint256 tokenId, bytes32 certId)`: Removes a specific certificate from a T3id. Can only be called by the T3id owner or contract owner.
+
+**Cross-chain Verification**
+- `requestVerification(uint16 dstChainId, uint256 tokenId, string category, bytes adapterParams)`: Initiates a cross-chain verification request via LayerZero. This allows applications to verify T3id certificates across different blockchains, enabling cross-chain identity verification.
+- `_nonblockingLzReceive(...)`: Handles incoming cross-chain verification requests, calculating scores and sending responses.
+
+**Scoring System**
+- `calculateLinearScore(uint256 issuanceDate, uint256 expirationDate, uint8 baseScore, uint8 minScore)`: Implements linear score decay for certificates. Scores decrease linearly from baseScore to minScore between issuance and expiration dates.
+- `_getScoreForCategory(uint256 tokenId, string category)`: Calculates the current score for a specific category by evaluating all valid certificates.
+
+**Key Features:**
+- Implements ERC721 standard with upgradeable proxy pattern for future improvements
+- Robust @name system with bidirectional mapping between tokenIds and @names
+- Comprehensive certificate lifecycle management
+- Cross-chain verification capabilities via LayerZero
+- Sophisticated scoring system with linear decay
+- Event emission for all major operations
+
+### T3idRegistry.sol
+
+Registry contract that manages certificate categories and approved issuers. This contract acts as a gatekeeper, controlling who can issue certificates and defining the scoring parameters for different certificate categories.
+
+**Key Functions:**
+
+**Issuer Management**
+- `approveIssuer(address issuer, string category)`: Approves an issuer for a specific category. Only the contract owner can approve issuers, ensuring trust in the system. Different categories have different approval requirements:
+  - Primary categories (KYC, government ID): Require strict verification
+  - Verified categories: Require partnership with Trident3
+  - Other categories: Open to all issuers
+
+**Category Management**
+- `setCategory(string category, uint8 baseScore, uint8 minScore)`: Configures scoring parameters for a category. Each category has:
+  - baseScore: Initial score value (0-100)
+  - minScore: Minimum score before expiration
+  - Example categories and scores:
+    - KYC: 40 base, 15 min
+    - FACE: 25 base, 5 min
+    - SOCIAL: 20 base, 5 min
+
+**Verification**
+- `canIssueForCategory(address issuer, string category)`: Checks if an issuer is approved for a specific category. Used by T3idImplementation during certificate issuance.
+
+**Key Features:**
+- Tiered category system with different trust levels
+- Flexible issuer approval mechanism
+- Owner-controlled category and scoring management
+- Integration with storage contract for persistent data
+
+### T3idStorageV2.sol
+
+Storage contract that maintains all certificate and scoring data. This contract implements a sophisticated storage pattern to efficiently manage T3id certificates and their associated data.
+
+**Key Functions:**
+
+**Certificate Management**
+- `setCertificate(...)`: Stores certificate data with comprehensive metadata:
+  - publicKey: For cryptographic operations
+  - issuer: Address of the certificate issuer
+  - issuance/expiration dates: For validity period
+  - category: Certificate type
+  - metadataURI: Link to additional off-chain data
+  - revocation status: For certificate invalidation
+
+**Query Operations**
+- `getCertificates(uint256 tokenId)`: Retrieves all valid certificates for a T3id
+- `getCertificatesByCategory(uint256 tokenId, string category)`: Filters certificates by category
+- `getCertificate(uint256 tokenId, bytes32 certId)`: Gets specific certificate data
+
+**Score Management**
+- `setCategoryScore(string category, uint8 baseScore, uint8 minScore)`: Configures scoring parameters
+- `getCategoryScore(string category)`: Retrieves category scoring rules
+
+**Key Structures:**
+```
+struct Certificate {
+    bytes32 publicKey;      // Public key for cryptographic operations
+    address issuer;         // Address that issued the certificate
+    uint256 issuanceDate;   // When the certificate was issued
+    uint256 expirationDate; // When the certificate expires (0 for no expiration)
+    uint8 certificateType;  // Type identifier for the certificate
+    string category;        // Category of the certificate (e.g., "KYC", "FACE")
+    string metadataURI;     // URI pointing to additional **metadata**
+    bool isRevoked;         // Whether the certificate has been revoked
+    uint256 index;          // Position in the certificateIds array
+}
+
+struct CategoryScore {
+    uint8 baseScore;        // Initial score value (0-100)
+    uint8 minScore;         // Minimum score before expiration
+}
+```
+
+**Storage Layout:**
+- Certificates are mapped by tokenId and certId for efficient lookup
+- Category scores are stored separately for flexible scoring rules
+- Certificate IDs are maintained in arrays for enumeration
+- Category certificate counts track the number of certificates per category
+
+**Usage Examples:**
+1. Storing KYC certificate:
+   - Issue certificate with government ID data
+   - Set appropriate expiration (e.g., 1 year)
+   - Link to off-chain KYC data in metadataURI
+
+2. Social verification:
+   - Issue certificate after OAuth verification
+   - Store public key for future verification
+   - No expiration date needed
+
+3. Face verification:
+   - Store biometric public key
+   - Link to encrypted biometric data
+   - Set regular renewal period
+
+For detailed function signatures and implementation details, see the contract source code.
